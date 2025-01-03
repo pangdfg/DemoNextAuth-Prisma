@@ -15,7 +15,6 @@ export default function Profile() {
     }
   }, [status, router])
 
-  // When after loading success and have session, show profile
   return (
     status === 'authenticated' &&
     session.user && (
@@ -24,8 +23,9 @@ export default function Profile() {
           <p>
             Welcome, <b>{session.user.name}!</b>
           </p>
+          <p>User ID: {session.user.id}</p>
           <p>Email: {session.user.email}</p>
-          <p>Role: {session.user.role}</p>
+          <p>Role: </p>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
             className="w-full bg-blue-500 text-white py-2 rounded"

@@ -1,7 +1,6 @@
-import NextAuth, { NextAuthOptions, Session } from 'next-auth'
+import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaClient } from '@prisma/client'
-import { JWT } from 'next-auth/jwt'
 import bcrypt from 'bcrypt'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { NextApiHandler } from 'next'
@@ -9,6 +8,21 @@ import { NextApiHandler } from 'next'
 
 const prisma = new PrismaClient()
 
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string,
+      name: string,
+      email: string,
+    }
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    token: string
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -50,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    session: async ({ session, token }: { session: Session, token: JWT }) => {
+    session: async ({ session, token }) => {
       if (session.user) {
         session.user.id = token.id as string
       }

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function SignUn() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [name, setName] = useState<string>('')
   const [error, setError] = useState<string | null>(null);
   const router = useRouter()
 
@@ -16,7 +17,7 @@ export default function SignUn() {
 
       const response = await fetch('http://localhost:3000/api/auth/signup', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
         headers: {
           'Content-Type': 'application/json'
         }
@@ -26,7 +27,7 @@ export default function SignUn() {
         router.push('/profile')
       }else{
         const data = await response.json();
-        setError(data.message || "Registration failed");
+        setError(data.err || "Registration failed");
       } 
 
     } catch (error) {
@@ -48,6 +49,17 @@ export default function SignUn() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-md shadow-md"
       >
+        <div className="mb-4">
+          <label htmlFor="name">Name</label>
+          <input
+            id="name"
+            type="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full border border-gray-300 px-3 py-2 rounded" // Added border
+          />
+        </div>
         <div className="mb-4">
           <label htmlFor="email">Email</label>
           <input
@@ -75,7 +87,7 @@ export default function SignUn() {
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded mb-4"
         >
-          Sign In
+          Sign Up
         </button>{' '}
         <p className="text-center text-sm text-gray-600">
             {'Already have an account? '}
