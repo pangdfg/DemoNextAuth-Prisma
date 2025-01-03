@@ -14,13 +14,15 @@ declare module 'next-auth' {
       id: string,
       name: string,
       email: string,
+      role: string
     }
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    token: string
+    token: string,
+    role: string
   }
 }
 
@@ -46,6 +48,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id.toString(),
             name: user.name,
             email: user.email,
+            role: user.role,
           }
         } else {
           throw new Error('Invalid email or password')
@@ -53,6 +56,7 @@ export const authOptions: NextAuthOptions = {
       },
     })
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
@@ -60,15 +64,17 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     jwt: async ({ token, user }) => {
       if (user) {
-        token.id = user.id
+        token.id = user.id;
+        token.role = user.role;  
       }
-      return token
+      return token;
     },
     session: async ({ session, token }) => {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
-      return session
+      return session;
     }
   },
 }
