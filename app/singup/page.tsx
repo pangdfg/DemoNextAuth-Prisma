@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function SignUn() {
@@ -14,7 +15,6 @@ export default function SignUn() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-
       const response = await fetch('http://localhost:3000/api/auth/signup', {
         method: 'POST',
         body: JSON.stringify({ name, email, password }),
@@ -24,14 +24,26 @@ export default function SignUn() {
       })
 
       if (response?.ok) {
-        router.push('/profile')
-      }else{
+        const result = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+        })
+        if (result?.error) {
+          console.error(result.error)
+          setError(result.error)
+        } else {
+          console.log('result', result)
+          router.push('/profile')
+        }
+      } else {
         const data = await response.json();
         setError(data.err || "Registration failed");
       } 
 
     } catch (error) {
       console.log('error', error)
+      setError("An unexpected error occurred")
     }
   }
 
