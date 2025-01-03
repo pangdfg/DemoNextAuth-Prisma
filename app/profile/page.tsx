@@ -28,6 +28,13 @@ export default function Profile() {
       <div className="flex h-screen items-center justify-center bg-black">
         <div className="max-w-md w-full bg-gray-900 rounded-lg shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6">
+            <div className="text-center mb-4">
+              <img
+                src={session.user.image}
+                alt="User Image"
+                className="rounded-full w-20 h-20 mx-auto"
+              />
+            </div>
             <h1 className="text-2xl font-bold text-white">Welcome, {session.user.name}!</h1>
             <p className="text-sm text-indigo-300 mt-1">Here is your profile information:</p>
           </div>

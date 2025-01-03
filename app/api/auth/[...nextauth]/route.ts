@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { NextApiHandler } from 'next'
-
+import GoogleProvider from "next-auth/providers/google";
 
 const prisma = new PrismaClient()
 
@@ -14,7 +14,8 @@ declare module 'next-auth' {
       id: string,
       name: string,
       email: string,
-      role: string
+      role: string,
+      image: string
     }
   }
 }
@@ -54,6 +55,17 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid email or password')
         }
       },
+      GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: `${profile.given_name} ${profile.family_name}`,
+          email: profile.email,
+          image: profile.picture,
+        }
+      },
     })
   ],
   secret: process.env.NEXTAUTH_SECRET,
@@ -73,9 +85,13 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.image = token.picture as string;
       }
       return session;
-    }
+    },
+    async redirect({ baseUrl }) {
+      return `${baseUrl}/profile`
+    },
   },
 }
 
