@@ -2,28 +2,33 @@
 
 import Link from 'next/link';
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-export default function SignIn() {
+export default function SignUn() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
+
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
 
-      if (result?.error) {
-        console.error(result.error)
-      } else {
+      if (response?.ok) {
         router.push('/profile')
-      }
+      }else{
+        const data = await response.json();
+        setError(data.message || "Registration failed");
+      } 
+
     } catch (error) {
       console.log('error', error)
     }
@@ -65,6 +70,7 @@ export default function SignIn() {
             className="w-full border border-gray-300 px-3 py-2 rounded" // Added border
           />
         </div>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded mb-4"
